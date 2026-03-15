@@ -1,0 +1,6 @@
+target/
+.idea/
+.mvn-home/
+.vscode/
+*.log
+.env

@@ -1,0 +1,1204 @@
+
+--- Fichier: ./widgets/UpcomingEventsWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { CalendarIcon } from '@heroicons/react/24/outline';
+import { Button } from '@components/common/forms/Button';
+import { useNavigate } from 'react-router-dom';
+
+/**
+ * Widget affichant les événements à venir
+ * Visible pour: events.view, events_all
+ */
+const UpcomingEventsWidget = ({ data }) => {
+    const navigate = useNavigate();
+    const stats = data || {};
+    const upcomingCount = stats.events?.totalUpcoming || 0;
+
+    return (
+        <Card title="Événements à venir" badge={upcomingCount}>
+            <div className="space-y-3">
+                {upcomingCount > 0 ? (
+                    <div className="text-center py-4">
+                        <CalendarIcon className="h-12 w-12 text-purple-500 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 mb-3">
+                            {upcomingCount} événement{upcomingCount > 1 ? 's' : ''} à venir
+                        </p>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => navigate('/events')}
+                        >
+                            Voir tous les événements
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="text-center py-4">
+                        <CalendarIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600">Aucun événement prévu</p>
+                    </div>
+                )}
+            </div>
+        </Card>
+    );
+};
+
+export default UpcomingEventsWidget;
+
+--- Fichier: ./widgets/PendingMembersWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { Button } from '@components/common/forms/Button';
+import { UserPlusIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
+
+/**
+ * Widget pour approuver les membres en attente
+ * Visible pour: members.approve, admin_all
+ */
+const PendingMembersWidget = ({ data }) => {
+    const navigate = useNavigate();
+    const stats = data || {};
+    const pendingCount = stats.members?.pending || 0;
+
+    return (
+        <Card title="Membres en attente" badge={pendingCount > 0 ? pendingCount : null}>
+            <div className="space-y-3">
+                {pendingCount > 0 ? (
+                    <div className="text-center py-4">
+                        <UserPlusIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 mb-3">
+                            {pendingCount} membre{pendingCount > 1 ? 's' : ''} en attente d'approbation
+                        </p>
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => navigate('/members?filter=pending')}
+                        >
+                            <CheckCircleIcon className="h-4 w-4 mr-1" />
+                            Traiter les demandes
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="text-center py-4">
+                        <CheckCircleIcon className="h-12 w-12 text-green-500 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600">Aucun membre en attente</p>
+                    </div>
+                )}
+            </div>
+        </Card>
+    );
+};
+
+export default PendingMembersWidget;
+
+--- Fichier: ./widgets/FinanceSummaryWidget.jsx ---
+import { useState } from 'react';
+import { Card } from '@components/common/data/Card';
+import { Button } from '@components/common/forms/Button';
+import { FinanceChart } from '../components/FinanceChart';
+import { formatCurrency } from '@utils/formatters';
+
+/**
+ * Widget affichant le résumé financier (graphique + résumé mensuel)
+ * Visible pour: finances.view, finances_all
+ */
+const FinanceSummaryWidget = ({ data }) => {
+    const [chartType, setChartType] = useState('line');
+    const stats = data || {};
+    const finances = stats.finances || {};
+    const historySeries = finances.history || finances.monthlySeries || finances.series || [];
+
+    return (
+        <Card
+            title="Évolution financière"
+            actions={
+                <div className="flex gap-2">
+                    <Button
+                        variant={chartType === 'line' ? 'primary' : 'secondary'}
+                        size="sm"
+                        onClick={() => setChartType('line')}
+                    >
+                        Ligne
+                    </Button>
+                    <Button
+                        variant={chartType === 'bar' ? 'primary' : 'secondary'}
+                        size="sm"
+                        onClick={() => setChartType('bar')}
+                    >
+                        Barres
+                    </Button>
+                </div>
+            }
+        >
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Recettes</p>
+                    <p className="mt-1 text-lg font-bold text-emerald-700">
+                        {formatCurrency(finances.monthlyIncome || 0)}
+                    </p>
+                </div>
+                <div className="rounded-xl border border-red-100 bg-red-50 px-3 py-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-red-700">Dépenses</p>
+                    <p className="mt-1 text-lg font-bold text-red-700">
+                        {formatCurrency(finances.monthlyExpenses || 0)}
+                    </p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Solde net</p>
+                    <p className="mt-1 text-lg font-bold text-slate-900">
+                        {formatCurrency(finances.netMonthly || 0)}
+                    </p>
+                </div>
+            </div>
+            <div className="-mx-2">
+                <FinanceChart data={historySeries} type={chartType} />
+            </div>
+        </Card>
+    );
+};
+
+export default FinanceSummaryWidget;
+
+--- Fichier: ./widgets/QuickActionsWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { Button } from '@components/common/forms/Button';
+import {
+    UserPlusIcon,
+    BanknotesIcon,
+    CalendarIcon,
+    DocumentPlusIcon,
+    Cog6ToothIcon
+} from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
+import { FEATURES } from '@config/app.config';
+
+/**
+ * Widget d'actions rapides pour les administrateurs
+ * Visible pour: admin_all, posts.manage, roles.manage, settings.view
+ */
+const QuickActionsWidget = () => {
+    const navigate = useNavigate();
+    const iconColors = {
+        blue: 'bg-primary-100 text-primary-700',
+        green: 'bg-emerald-100 text-emerald-700',
+        purple: 'bg-indigo-100 text-indigo-700',
+        yellow: 'bg-amber-100 text-amber-700',
+        gray: 'bg-slate-100 text-slate-700'
+    };
+
+    const actions = [
+        {
+            label: 'Ajouter un membre',
+            icon: UserPlusIcon,
+            color: 'blue',
+            onClick: () => navigate('/members?action=add')
+        },
+        {
+            label: 'Nouvelle transaction',
+            icon: BanknotesIcon,
+            color: 'green',
+            onClick: () => navigate('/transactions?action=add')
+        },
+        {
+            label: 'Créer un événement',
+            icon: CalendarIcon,
+            color: 'purple',
+            onClick: () => navigate('/events?action=add')
+        },
+        {
+            label: 'Ajouter un document',
+            icon: DocumentPlusIcon,
+            color: 'yellow',
+            onClick: () => navigate('/documents?action=upload'),
+            feature: 'documents'
+        },
+        {
+            label: 'Paramètres',
+            icon: Cog6ToothIcon,
+            color: 'gray',
+            onClick: () => navigate('/settings')
+        }
+    ];
+
+    return (
+        <Card title="Actions rapides">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {actions
+                    .filter((action) => !action.feature || FEATURES[action.feature])
+                    .map((action, idx) => (
+                    <Button
+                        key={idx}
+                        variant="secondary"
+                        size="sm"
+                        onClick={action.onClick}
+                        className="flex items-center gap-3 px-3 py-3 text-left"
+                    >
+                        <span className={`rounded-lg p-2 ${iconColors[action.color] || iconColors.gray}`}>
+                            <action.icon className="h-5 w-5" />
+                        </span>
+                        <span className="text-sm font-semibold">{action.label}</span>
+                    </Button>
+                ))}
+            </div>
+        </Card>
+    );
+};
+
+export default QuickActionsWidget;
+
+--- Fichier: ./widgets/WelcomeWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { HandRaisedIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { useAuthStore } from '@store/authStore';
+
+/**
+ * Widget de bienvenue pour les membres simples
+ * Visible pour: tous (permissions: null)
+ */
+const WelcomeWidget = ({ data: _data }) => {
+    const user = useAuthStore((state) => state.user);
+
+    return (
+        <Card>
+            <div className="text-center py-8">
+                <HandRaisedIcon className="h-16 w-16 text-primary-600 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    Bienvenue{user?.firstName ? `, ${user.firstName}` : ''} !
+                </h3>
+                <p className="text-gray-600 mb-4">
+                    Vous êtes membre de l'association. Consultez les événements à venir et les annonces.
+                </p>
+                <div className="flex justify-center space-x-4">
+                    <Link
+                        to="/events"
+                        className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                    >
+                        Voir les événements →
+                    </Link>
+                    <Link
+                        to="/announcements"
+                        className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                    >
+                        Lire les annonces →
+                    </Link>
+                </div>
+            </div>
+        </Card>
+    );
+};
+
+export default WelcomeWidget;
+
+--- Fichier: ./widgets/BudgetWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { ChartBarIcon } from '@heroicons/react/24/outline';
+import { formatCurrency } from '@utils/formatters';
+
+/**
+ * Widget affichant le budget et les dépenses
+ * Visible pour: finances.approve, finances_all
+ */
+const BudgetWidget = ({ data }) => {
+    const stats = data || {};
+    const budget = Number(stats.finances?.budget || 0);
+    const spent = Number(stats.finances?.monthlyExpenses || 0);
+    const remaining = budget - spent;
+    const percentageUsed = budget > 0 ? (spent / budget) * 100 : 0;
+
+    return (
+        <Card title="Budget mensuel">
+            <div className="space-y-4">
+                <div className="flex items-center justify-center">
+                    <ChartBarIcon className="h-16 w-16 text-primary-600" />
+                </div>
+
+                <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Budget total</span>
+                        <span className="font-semibold text-gray-900">{formatCurrency(budget)}</span>
+                    </div>
+
+                    <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Dépensé</span>
+                        <span className="font-semibold text-red-600">{formatCurrency(spent)}</span>
+                    </div>
+
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                            className={`h-2.5 rounded-full ${percentageUsed > 90 ? 'bg-red-600' : percentageUsed > 70 ? 'bg-yellow-500' : 'bg-green-600'
+                                }`}
+                            style={{ width: `${Math.min(percentageUsed, 100)}%` }}
+                        ></div>
+                    </div>
+
+                    <div className="flex justify-between text-sm pt-2 border-t">
+                        <span className="text-gray-600">Restant</span>
+                        <span className={`font-bold ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatCurrency(remaining)}
+                        </span>
+                    </div>
+
+                    {budget <= 0 && (
+                        <p className="pt-1 text-xs text-slate-500">
+                            Aucun budget mensuel défini pour l'instant.
+                        </p>
+                    )}
+                </div>
+            </div>
+        </Card>
+    );
+};
+
+export default BudgetWidget;
+
+--- Fichier: ./widgets/StatsOverview.jsx ---
+import { UsersIcon, BanknotesIcon, CalendarIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { StatCard } from '@components/common/data/StatCard';
+import { formatCurrency } from '@utils/formatters';
+
+/**
+ * Widget affichant les statistiques principales (4 cartes)
+ * Visible pour: admin_all, members.view, finances.view, events.view
+ */
+const StatsOverview = ({ data }) => {
+    const stats = data || {};
+    const members = stats.members || {};
+    const finances = stats.finances || {};
+    const events = stats.events || {};
+    const documents = stats.documents || {};
+
+    return (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+                title="Membres actifs"
+                value={members.active || 0}
+                icon={UsersIcon}
+                color="blue"
+            />
+            <StatCard
+                title="Solde actuel"
+                value={formatCurrency(finances.currentBalance || 0)}
+                icon={BanknotesIcon}
+                color="green"
+            />
+            <StatCard
+                title="Événements à venir"
+                value={events.totalUpcoming || 0}
+                icon={CalendarIcon}
+                color="purple"
+            />
+            <StatCard
+                title="Documents"
+                value={documents.total || 0}
+                icon={DocumentTextIcon}
+                color="yellow"
+            />
+        </div>
+    );
+};
+
+export default StatsOverview;
+
+--- Fichier: ./widgets/DocumentsWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import { Button } from '@components/common/forms/Button';
+import { useNavigate } from 'react-router-dom';
+
+/**
+ * Widget affichant les documents récents
+ * Visible pour: documents.view, documents_all
+ */
+const DocumentsWidget = ({ data }) => {
+    const navigate = useNavigate();
+    const stats = data || {};
+    const docsCount = stats.documents?.total || 0;
+
+    return (
+        <Card title="Documents" badge={docsCount}>
+            <div className="space-y-3">
+                {docsCount > 0 ? (
+                    <div className="text-center py-4">
+                        <DocumentTextIcon className="h-12 w-12 text-yellow-500 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 mb-3">
+                            {docsCount} document{docsCount > 1 ? 's' : ''} disponible{docsCount > 1 ? 's' : ''}
+                        </p>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => navigate('/documents')}
+                        >
+                            Voir les documents
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="text-center py-4">
+                        <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600">Aucun document</p>
+                    </div>
+                )}
+            </div>
+        </Card>
+    );
+};
+
+export default DocumentsWidget;
+
+--- Fichier: ./widgets/TransactionsListWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
+import { formatCurrency, formatRelativeTime } from '@utils/formatters';
+
+/**
+ * Widget affichant la liste des transactions récentes
+ * Visible pour: finances.view, finances_all
+ */
+const TransactionsListWidget = ({ data }) => {
+    const stats = data || {};
+    const transactions = stats.finances?.recentTransactions || [];
+
+    return (
+        <Card title="Transactions récentes">
+            <div className="space-y-3">
+                {transactions.length > 0 ? (
+                    transactions.slice(0, 5).map((transaction, idx) => (
+                        <div key={idx} className="flex items-center justify-between border-b pb-3 last:border-0">
+                            <div className="flex items-center space-x-3">
+                                {transaction.type === 'INCOME' ? (
+                                    <ArrowTrendingUpIcon className="h-5 w-5 text-green-600" />
+                                ) : (
+                                    <ArrowTrendingDownIcon className="h-5 w-5 text-red-600" />
+                                )}
+                                <div>
+                                    <p className="text-sm font-medium text-gray-900">{transaction.description || 'Transaction'}</p>
+                                    <p className="text-xs text-gray-500">{formatRelativeTime(transaction.createdAt || transaction.date)}</p>
+                                </div>
+                            </div>
+                            <span className={`text-sm font-semibold ${transaction.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+                                }`}>
+                                {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrency(transaction.amount || 0)}
+                            </span>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-sm text-gray-500 text-center py-4">Aucune transaction récente</p>
+                )}
+            </div>
+        </Card>
+    );
+};
+
+export default TransactionsListWidget;
+
+--- Fichier: ./widgets/ActivityFeedWidget.jsx ---
+import { Card } from '@components/common/data/Card';
+import { Badge } from '@components/common/data/Badge';
+import { formatRelativeTime } from '@utils/formatters';
+
+/**
+ * Widget affichant les activités récentes
+ * Visible pour: tous les utilisateurs (permissions: null)
+ */
+const ActivityFeedWidget = ({ data }) => {
+    const stats = data || {};
+    const activities = stats.recentActivities || [];
+
+    return (
+        <Card title="Activités récentes">
+            <div className="space-y-3">
+                {activities.length > 0 ? (
+                    activities.slice(0, 5).map((activity, idx) => (
+                    <div key={idx} className="flex items-start justify-between border-b pb-3 last:border-0">
+                        <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-gray-900">{activity.description}</p>
+                            <p className="text-xs text-gray-500">
+                                {activity.userName || 'Système'} • {formatRelativeTime(activity.createdAt)}
+                            </p>
+                        </div>
+                        {activity.entityType && (
+                            <Badge variant="default" className="ml-3">
+                                {activity.entityType}
+                            </Badge>
+                        )}
+                    </div>
+                    ))
+                ) : (
+                    <p className="text-sm text-gray-500">Aucune activité récente</p>
+                )}
+            </div>
+        </Card>
+    );
+};
+
+export default ActivityFeedWidget;
+
+--- Fichier: ./SuperAdminDashboard.jsx ---
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import {
+  BuildingOfficeIcon,
+  UsersIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon
+} from '@heroicons/react/24/outline';
+import { Card } from '@components/common/data/Card';
+import { Badge } from '@components/common/data/Badge';
+import { Button } from '@components/common/forms/Button';
+import { PageHeader } from '@components/common/data/PageHeader';
+import { Spinner } from '@components/common/feedback/Spinner';
+import { formatRelativeTime } from '@utils/formatters';
+import { associationsService } from '@api/services/associations.service';
+import { auditService } from '@api/services/audit.service';
+
+const toArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.content)) return payload.content;
+  if (Array.isArray(payload?.data?.content)) return payload.data.content;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+};
+
+const toNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const normalizeStatus = (status) => String(status || 'UNKNOWN').toUpperCase();
+
+const statusToVariant = (status) => {
+  if (status === 'ACTIVE') return 'success';
+  if (status === 'SUSPENDED') return 'danger';
+  if (status === 'INACTIVE' || status === 'ARCHIVED') return 'warning';
+  return 'default';
+};
+
+const SuperAdminDashboard = () => {
+  const [showAllAssociations, setShowAllAssociations] = useState(false);
+
+  const { data: dashboardData, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ['super-admin-dashboard'],
+    queryFn: async () => {
+      const [associationsRes, auditRes] = await Promise.all([
+        associationsService.getAll(),
+        auditService.getLogs({ size: 20 })
+      ]);
+
+      const associations = toArray(associationsRes);
+      const recentActivities = toArray(auditRes).map((log) => ({
+        id: log.id,
+        action: log.action || 'UNKNOWN',
+        module: log.entityType || '-',
+        user: log.userName || log.userEmail || (log.userId != null ? `User#${log.userId}` : 'Systeme'),
+        association: log.associationId != null ? `Association#${log.associationId}` : '-',
+        createdAt: log.createdAt
+      }));
+
+      const totalUsers = associations.reduce((sum, assoc) => sum + toNumber(assoc?.totalMembersCount), 0);
+      const activeAssociations = associations.filter((assoc) => normalizeStatus(assoc?.status) === 'ACTIVE').length;
+      const suspendedAssociations = associations.filter((assoc) => normalizeStatus(assoc?.status) === 'SUSPENDED').length;
+      const associationsWithoutContact = associations.filter((assoc) => !assoc?.contactEmail).length;
+      const associationsWithoutMembers = associations.filter((assoc) => toNumber(assoc?.totalMembersCount) === 0).length;
+
+      return {
+        associations,
+        kpis: {
+          totalAssociations: associations.length,
+          activeAssociations,
+          suspendedAssociations,
+          totalUsers
+        },
+        recentActivities,
+        alerts: {
+          associationsWithoutContact,
+          associationsWithoutMembers
+        }
+      };
+    }
+  });
+
+  if (isLoading) return <Spinner size="lg" />;
+
+  const visibleAssociations = showAllAssociations
+    ? dashboardData.associations
+    : dashboardData.associations.slice(0, 10);
+
+  const statsCards = [
+    {
+      label: 'Associations',
+      value: dashboardData.kpis.totalAssociations,
+      subtitle: `${dashboardData.kpis.activeAssociations} actives`,
+      icon: BuildingOfficeIcon,
+      tone: 'blue'
+    },
+    {
+      label: 'Actives',
+      value: dashboardData.kpis.activeAssociations,
+      subtitle: 'Associations operationnelles',
+      icon: CheckCircleIcon,
+      tone: 'green'
+    },
+    {
+      label: 'Suspendues',
+      value: dashboardData.kpis.suspendedAssociations,
+      subtitle: 'A traiter en priorite',
+      icon: ExclamationTriangleIcon,
+      tone: 'amber'
+    },
+    {
+      label: 'Utilisateurs',
+      value: dashboardData.kpis.totalUsers,
+      subtitle: 'Tous tenants confondus',
+      icon: UsersIcon,
+      tone: 'slate'
+    }
+  ];
+
+  const toneClasses = {
+    blue: 'bg-primary-100 text-primary-700',
+    green: 'bg-emerald-100 text-emerald-700',
+    amber: 'bg-amber-100 text-amber-700',
+    slate: 'bg-slate-100 text-slate-700'
+  };
+
+  const riskIndicators = [];
+  if (dashboardData.kpis.suspendedAssociations > 0) {
+    riskIndicators.push(`${dashboardData.kpis.suspendedAssociations} association(s) suspendue(s) a traiter.`);
+  }
+  if (dashboardData.kpis.totalAssociations === 0) {
+    riskIndicators.push('Aucune association enregistree.');
+  }
+  if (dashboardData.alerts.associationsWithoutContact > 0) {
+    riskIndicators.push(`${dashboardData.alerts.associationsWithoutContact} association(s) sans email de contact.`);
+  }
+  if (dashboardData.alerts.associationsWithoutMembers > 0) {
+    riskIndicators.push(`${dashboardData.alerts.associationsWithoutMembers} association(s) sans membre actif.`);
+  }
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Dashboard système"
+        subtitle="Operations quotidiennes multi-associations"
+        actions={(
+          <Button variant="secondary" size="sm" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching ? 'Actualisation...' : 'Actualiser'}
+          </Button>
+        )}
+      />
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {statsCards.map((card) => (
+          <Card key={card.label}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-slate-500">{card.label}</p>
+                <p className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">{card.value}</p>
+                <p className="mt-1 text-xs text-slate-500">{card.subtitle}</p>
+              </div>
+              <div className={`rounded-xl p-3 ${toneClasses[card.tone]}`}>
+                <card.icon className="h-8 w-8" />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <Card title="Points d'attention">
+        {riskIndicators.length > 0 ? (
+          <div className="space-y-2">
+            {riskIndicators.map((item) => (
+              <div key={item} className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+                <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 text-amber-700" />
+                <p className="text-sm font-medium text-amber-800">{item}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
+            Aucun point critique detecte.
+          </div>
+        )}
+      </Card>
+
+      <Card title="Activite systeme recente">
+        <div className="max-h-96 space-y-3 overflow-y-auto">
+          {dashboardData.recentActivities.slice(0, 12).map((activity) => (
+            <div key={activity.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="mb-1 flex items-center gap-2">
+                <Badge variant="default">{activity.module}</Badge>
+                <span className="text-xs font-semibold uppercase text-slate-500">{activity.action}</span>
+              </div>
+              <p className="text-sm font-medium text-slate-900">{activity.user}</p>
+              <p className="text-xs text-slate-500">
+                {activity.association} • {formatRelativeTime(activity.createdAt)}
+              </p>
+            </div>
+          ))}
+          {dashboardData.recentActivities.length === 0 && (
+            <p className="py-6 text-sm text-slate-500">Aucune activite systeme recente.</p>
+          )}
+        </div>
+      </Card>
+
+      <Card
+        title="Associations"
+        actions={dashboardData.associations.length > 10 ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowAllAssociations((prev) => !prev)}
+          >
+            {showAllAssociations ? 'Voir moins' : `Voir tout (${dashboardData.associations.length})`}
+          </Button>
+        ) : null}
+      >
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Association
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Membres
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Contact
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Statut
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {visibleAssociations.map((assoc) => {
+                const status = normalizeStatus(assoc.status);
+
+                return (
+                  <tr key={assoc.id} className="hover:bg-slate-50">
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <p className="font-semibold text-slate-900">{assoc.name}</p>
+                      <p className="text-xs text-slate-500">{assoc.slug}</p>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-700">
+                      {toNumber(assoc.totalMembersCount)}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">
+                      {assoc.contactEmail || '-'}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-sm">
+                      <Badge variant={statusToVariant(status)}>{status}</Badge>
+                    </td>
+                  </tr>
+                );
+              })}
+              {visibleAssociations.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-slate-500">
+                    Aucune association disponible.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+export default SuperAdminDashboard;
+
+--- Fichier: ./DashboardPage.jsx ---
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Spinner } from '@components/common/feedback/Spinner';
+import { PageHeader } from '@components/common/data/PageHeader';
+import { useDashboard } from '@hooks/useDashboard';
+import { usePermissions } from '@hooks/usePermissions';
+import { useDashboardPersona } from '@hooks/useDashboardPersona';
+import SuperAdminDashboard from './SuperAdminDashboard';
+import {
+  DASHBOARD_PERSONAS,
+  DASHBOARD_WIDGET_RULES,
+  DASHBOARD_WIDGET_SPANS
+} from './persona.config';
+import { FEATURES } from '@config/app.config';
+
+// Import de tous les widgets
+import StatsOverview from './widgets/StatsOverview';
+import PendingMembersWidget from './widgets/PendingMembersWidget';
+import FinanceSummaryWidget from './widgets/FinanceSummaryWidget';
+import TransactionsListWidget from './widgets/TransactionsListWidget';
+import BudgetWidget from './widgets/BudgetWidget';
+import UpcomingEventsWidget from './widgets/UpcomingEventsWidget';
+import DocumentsWidget from './widgets/DocumentsWidget';
+import QuickActionsWidget from './widgets/QuickActionsWidget';
+import ActivityFeedWidget from './widgets/ActivityFeedWidget';
+import WelcomeWidget from './widgets/WelcomeWidget';
+
+// Map des composants widgets
+const WIDGET_COMPONENTS = {
+  StatsOverview,
+  PendingMembersWidget,
+  FinanceSummaryWidget,
+  TransactionsListWidget,
+  BudgetWidget,
+  UpcomingEventsWidget,
+  DocumentsWidget,
+  QuickActionsWidget,
+  ActivityFeedWidget,
+  WelcomeWidget
+};
+
+const DashboardPage = () => {
+  const { canAny } = usePermissions();
+  const { persona, header, layout } = useDashboardPersona();
+  const { data: dashboard, isLoading } = useDashboard();
+  const [showSecondaryWidgets, setShowSecondaryWidgets] = useState(false);
+  const dashboardData = dashboard || {};
+  const widgetsBySection = {
+    hero: layout?.hero || [],
+    core: layout?.core || [],
+    secondary: layout?.secondary || []
+  };
+
+  if (isLoading) return <Spinner size="lg" />;
+
+  // Super Admin → Dashboard système
+  if (persona === DASHBOARD_PERSONAS.SUPER_ADMIN) {
+    return <SuperAdminDashboard />;
+  }
+
+  const isWidgetVisible = (widgetId) => {
+    const widgetRules = DASHBOARD_WIDGET_RULES[widgetId];
+    if (!widgetRules) return false;
+
+    if (widgetRules.feature && !FEATURES[widgetRules.feature]) {
+      return false;
+    }
+
+    if (!widgetRules.anyPermissions || widgetRules.anyPermissions.length === 0) {
+      return true;
+    }
+
+    return canAny(widgetRules.anyPermissions);
+  };
+
+  const heroWidgets = widgetsBySection.hero.filter(isWidgetVisible).slice(0, 3);
+  const coreWidgets = widgetsBySection.core.filter(isWidgetVisible);
+  const secondaryWidgets = widgetsBySection.secondary.filter(isWidgetVisible);
+  const displayedSecondaryWidgets = showSecondaryWidgets ? secondaryWidgets : [];
+
+  const renderWidgets = (widgetIds, sectionName) =>
+    widgetIds.map((widgetId) => {
+      const WidgetComponent = WIDGET_COMPONENTS[widgetId];
+      if (!WidgetComponent) return null;
+
+      const spanClass = DASHBOARD_WIDGET_SPANS[widgetId]?.[sectionName] || '';
+      return (
+        <div key={`${sectionName}-${widgetId}`} className={spanClass}>
+          <WidgetComponent data={dashboardData} />
+        </div>
+      );
+    });
+
+  const hasNoWidgets =
+    heroWidgets.length === 0 && coreWidgets.length === 0 && secondaryWidgets.length === 0;
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title={header.title} subtitle={header.description} />
+
+      {secondaryWidgets.length > 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Vue essentielle</p>
+              <p className="text-xs text-slate-500">
+                {heroWidgets.length + coreWidgets.length} sections cles affichees
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowSecondaryWidgets((prev) => !prev)}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              {showSecondaryWidgets
+                ? 'Masquer les details'
+                : `Afficher plus (${secondaryWidgets.length})`}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {heroWidgets.length > 0 && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          {renderWidgets(heroWidgets, 'hero')}
+        </div>
+      )}
+
+      {coreWidgets.length > 0 && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          {renderWidgets(coreWidgets, 'core')}
+        </div>
+      )}
+
+      {displayedSecondaryWidgets.length > 0 && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          {renderWidgets(displayedSecondaryWidgets, 'secondary')}
+        </div>
+      )}
+
+      {hasNoWidgets && (
+        <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 py-16 text-center">
+          <div className="mx-auto max-w-md">
+            <h3 className="text-lg font-semibold text-slate-900">Aucune section disponible</h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Vos permissions actuelles ne donnent pas acces au cockpit complet.
+            </p>
+            <div className="mt-5 flex justify-center gap-4 text-sm">
+              <Link to="/events" className="font-semibold text-primary-600 hover:text-primary-700">
+                Voir les evenements
+              </Link>
+              <Link to="/announcements" className="font-semibold text-primary-600 hover:text-primary-700">
+                Lire les annonces
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DashboardPage;
+
+--- Fichier: ./components/FinanceChart.jsx ---
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+export const FinanceChart = ({ data, type = 'line' }) => {
+  const chartData = Array.isArray(data)
+    ? data
+      .map((point, index) => ({
+        month: point?.month || point?.label || point?.period || point?.name || `P${index + 1}`,
+        income: Number(point?.income ?? point?.monthlyIncome ?? point?.credit ?? 0),
+        expense: Number(point?.expense ?? point?.monthlyExpenses ?? point?.debit ?? 0)
+      }))
+      .filter((point) => Number.isFinite(point.income) && Number.isFinite(point.expense))
+    : [];
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload?.length) {
+      return (
+        <div className="rounded-lg bg-white p-3 shadow-lg">
+          <p className="text-sm font-medium text-gray-900">{payload[0].payload.month}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: {entry.value.toLocaleString()} FCFA
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  if (chartData.length < 2) {
+    return (
+      <div className="flex h-[300px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center">
+        <div>
+          <p className="text-sm font-semibold text-slate-700">Pas assez d&apos;historique</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Les donnees de serie financiere ne sont pas encore disponibles.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === 'bar') {
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" />
+          <YAxis />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          <Bar dataKey="income" fill="#10b981" name="Recettes" />
+          <Bar dataKey="expense" fill="#ef4444" name="Dépenses" />
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={chartData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="month" />
+        <YAxis />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend />
+        <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} name="Recettes" />
+        <Line type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={2} name="Dépenses" />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+
+--- Fichier: ./persona.config.js ---
+export const DASHBOARD_PERSONAS = Object.freeze({
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  TREASURER: 'TREASURER',
+  SECRETARY: 'SECRETARY',
+  EVENT_MANAGER: 'EVENT_MANAGER',
+  MEMBER: 'MEMBER'
+});
+
+export const DASHBOARD_HEADERS = Object.freeze({
+  [DASHBOARD_PERSONAS.ADMIN]: {
+    title: 'Tableau de bord administrateur',
+    description: "Pilotage operationnel de l'association"
+  },
+  [DASHBOARD_PERSONAS.TREASURER]: {
+    title: 'Tableau de bord financier',
+    description: 'Suivi finances, budget et tresorerie'
+  },
+  [DASHBOARD_PERSONAS.SECRETARY]: {
+    title: 'Tableau de bord secretariat',
+    description: 'Gestion membres, documents et suivi quotidien'
+  },
+  [DASHBOARD_PERSONAS.EVENT_MANAGER]: {
+    title: 'Tableau de bord evenements',
+    description: 'Planification et execution des evenements'
+  },
+  [DASHBOARD_PERSONAS.MEMBER]: {
+    title: 'Tableau de bord',
+    description: "Vue claire des activites de l'association"
+  }
+});
+
+export const DASHBOARD_LAYOUTS = Object.freeze({
+  [DASHBOARD_PERSONAS.ADMIN]: {
+    hero: ['StatsOverview', 'PendingMembersWidget', 'QuickActionsWidget'],
+    core: ['FinanceSummaryWidget'],
+    secondary: ['TransactionsListWidget', 'UpcomingEventsWidget', 'ActivityFeedWidget', 'DocumentsWidget']
+  },
+  [DASHBOARD_PERSONAS.TREASURER]: {
+    hero: ['StatsOverview', 'FinanceSummaryWidget', 'BudgetWidget'],
+    core: ['TransactionsListWidget'],
+    secondary: ['QuickActionsWidget', 'ActivityFeedWidget', 'UpcomingEventsWidget']
+  },
+  [DASHBOARD_PERSONAS.SECRETARY]: {
+    hero: ['StatsOverview', 'PendingMembersWidget', 'QuickActionsWidget'],
+    core: ['ActivityFeedWidget'],
+    secondary: ['UpcomingEventsWidget', 'DocumentsWidget']
+  },
+  [DASHBOARD_PERSONAS.EVENT_MANAGER]: {
+    hero: ['StatsOverview', 'UpcomingEventsWidget', 'QuickActionsWidget'],
+    core: ['ActivityFeedWidget'],
+    secondary: ['PendingMembersWidget', 'DocumentsWidget']
+  },
+  [DASHBOARD_PERSONAS.MEMBER]: {
+    hero: ['StatsOverview', 'UpcomingEventsWidget', 'WelcomeWidget'],
+    core: ['ActivityFeedWidget'],
+    secondary: ['DocumentsWidget']
+  }
+});
+
+export const DASHBOARD_WIDGET_RULES = Object.freeze({
+  StatsOverview: {
+    anyPermissions: ['admin_all', 'members.view', 'finances.view', 'events.view']
+  },
+  PendingMembersWidget: {
+    anyPermissions: ['members.approve', 'members_all', 'admin_all']
+  },
+  FinanceSummaryWidget: {
+    anyPermissions: ['finances.view', 'finances.approve', 'finances_all', 'admin_all']
+  },
+  TransactionsListWidget: {
+    anyPermissions: ['finances.view', 'finances.approve', 'finances_all', 'admin_all']
+  },
+  BudgetWidget: {
+    anyPermissions: ['finances.approve', 'finances_all', 'admin_all']
+  },
+  UpcomingEventsWidget: {
+    anyPermissions: ['events.view', 'events.manage', 'events_all', 'admin_all']
+  },
+  DocumentsWidget: {
+    feature: 'documents',
+    anyPermissions: ['documents.view', 'documents.upload', 'documents_all', 'admin_all']
+  },
+  QuickActionsWidget: {
+    anyPermissions: [
+      'admin_all',
+      'members.approve',
+      'finances.approve',
+      'events.manage',
+      'roles.manage',
+      'posts.manage',
+      'settings.view',
+      'settings.update'
+    ]
+  },
+  ActivityFeedWidget: {},
+  WelcomeWidget: {}
+});
+
+export const DASHBOARD_WIDGET_SPANS = Object.freeze({
+  StatsOverview: {
+    hero: 'xl:col-span-2'
+  },
+  FinanceSummaryWidget: {
+    core: 'xl:col-span-2'
+  },
+  TransactionsListWidget: {
+    core: 'xl:col-span-2'
+  },
+  ActivityFeedWidget: {
+    core: 'xl:col-span-2'
+  },
+  WelcomeWidget: {
+    core: 'xl:col-span-2'
+  }
+});
+
+--- Fichier: ./Dashboard.txt ---
+
+--- Fichier: ./persona.resolver.js ---
+import { FEATURES } from '@config/app.config';
+import { hasAnyPermission, hasPermission, isSuperAdmin } from '@utils/permissions';
+import { DASHBOARD_LAYOUTS, DASHBOARD_PERSONAS } from './persona.config';
+
+const cloneLayout = (layout) => ({
+  hero: [...(layout?.hero || [])],
+  core: [...(layout?.core || [])],
+  secondary: [...(layout?.secondary || [])]
+});
+
+export const resolveDashboardPersona = (user) => {
+  if (isSuperAdmin(user)) return DASHBOARD_PERSONAS.SUPER_ADMIN;
+  if (hasPermission(user, 'admin_all')) return DASHBOARD_PERSONAS.ADMIN;
+  if (hasAnyPermission(user, ['finances.approve', 'finances_all'])) return DASHBOARD_PERSONAS.TREASURER;
+  if (hasAnyPermission(user, ['members.approve', 'documents.upload'])) return DASHBOARD_PERSONAS.SECRETARY;
+  if (hasPermission(user, 'events.manage')) return DASHBOARD_PERSONAS.EVENT_MANAGER;
+  return DASHBOARD_PERSONAS.MEMBER;
+};
+
+export const resolveDashboardLayout = ({ persona, user, features = FEATURES }) => {
+  const baseLayout = cloneLayout(DASHBOARD_LAYOUTS[persona] || DASHBOARD_LAYOUTS[DASHBOARD_PERSONAS.MEMBER]);
+  const canSeeDocuments = features.documents && hasAnyPermission(user, ['documents.view', 'documents.upload', 'documents_all', 'admin_all']);
+
+  if (!canSeeDocuments) {
+    baseLayout.hero = baseLayout.hero.filter((widget) => widget !== 'DocumentsWidget');
+    baseLayout.core = baseLayout.core.filter((widget) => widget !== 'DocumentsWidget');
+    baseLayout.secondary = baseLayout.secondary.filter((widget) => widget !== 'DocumentsWidget');
+  }
+
+  baseLayout.hero = baseLayout.hero.slice(0, 3);
+
+  return baseLayout;
+};

@@ -1,0 +1,60 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading...",
+    "logout": "Logout"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "finances": "Finances",
+    "events": "Events",
+    "documents": "Documents",
+    "messages": "Messages",
+    "announcements": "Announcements",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalMembers": "Total Members",
+    "activeMembers": "Active Members",
+    "pendingMembers": "Pending",
+    "totalRevenue": "Total Revenue"
+  },
+  "transactions": {
+    "title": "Finances",
+    "subtitle": "Financial transactions management",
+    "newTransaction": "New transaction",
+    "income": "Income",
+    "expense": "Expenses",
+    "balance": "Balance",
+    "pending": "Pending transactions",
+    "recent": "Recent transactions",
+    "exportPDF": "Export PDF",
+    "exportExcel": "Export Excel"
+  },
+  "messages": {
+    "title": "Messages",
+    "noConversations": "No conversations",
+    "selectConversation": "Select a conversation",
+    "typeMessage": "Type your message...",
+    "send": "Send"
+  },
+  "announcements": {
+    "title": "Announcements",
+    "subtitle": "Official communications",
+    "newAnnouncement": "New announcement",
+    "noAnnouncements": "No announcements yet",
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    }
+  }
+}

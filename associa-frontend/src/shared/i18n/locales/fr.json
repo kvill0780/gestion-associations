@@ -1,0 +1,60 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "logout": "Déconnexion"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "members": "Membres",
+    "finances": "Finances",
+    "events": "Événements",
+    "documents": "Documents",
+    "messages": "Messages",
+    "announcements": "Annonces",
+    "settings": "Paramètres"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "totalMembers": "Total Membres",
+    "activeMembers": "Membres Actifs",
+    "pendingMembers": "En attente",
+    "totalRevenue": "Recettes Totales"
+  },
+  "transactions": {
+    "title": "Finances",
+    "subtitle": "Gestion des transactions financières",
+    "newTransaction": "Nouvelle transaction",
+    "income": "Recettes",
+    "expense": "Dépenses",
+    "balance": "Solde",
+    "pending": "Transactions en attente",
+    "recent": "Transactions récentes",
+    "exportPDF": "Exporter PDF",
+    "exportExcel": "Exporter Excel"
+  },
+  "messages": {
+    "title": "Messages",
+    "noConversations": "Aucune conversation",
+    "selectConversation": "Sélectionnez une conversation",
+    "typeMessage": "Écrivez votre message...",
+    "send": "Envoyer"
+  },
+  "announcements": {
+    "title": "Annonces",
+    "subtitle": "Communications officielles de l'association",
+    "newAnnouncement": "Nouvelle annonce",
+    "noAnnouncements": "Aucune annonce pour le moment",
+    "priority": {
+      "low": "Faible",
+      "normal": "Normal",
+      "high": "Élevée",
+      "urgent": "Urgent"
+    }
+  }
+}

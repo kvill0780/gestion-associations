@@ -1,0 +1,426 @@
+{
+  "info": {
+    "name": "Associa API Complete",
+    "description": "Collection complète pour tester toutes les API Associa Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080/api"},
+    {"key": "accessToken", "value": ""},
+    {"key": "refreshToken", "value": ""},
+    {"key": "userId", "value": "1"},
+    {"key": "associationId", "value": "1"},
+    {"key": "roleId", "value": "1"},
+    {"key": "postId", "value": "1"},
+    {"key": "mandateId", "value": "1"}
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{"key": "token", "value": "{{accessToken}}"}]
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"Password123!\",\n  \"firstName\": \"Jean\",\n  \"lastName\": \"Dupont\",\n  \"whatsapp\": \"+22670123456\",\n  \"associationId\": 1\n}"}
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{"listen": "test", "script": {"exec": ["var data = pm.response.json();", "if(data.data) {", "  pm.collectionVariables.set('accessToken', data.data.accessToken);", "  pm.collectionVariables.set('refreshToken', data.data.refreshToken);", "}"]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"}
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/auth/me"}
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/refresh",
+            "body": {"mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"}
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/logout",
+            "body": {"mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\",\n  \"revokeAllTokens\": false\n}"}
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/forgot-password",
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"user@example.com\"\n}"}
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/reset-password",
+            "body": {"mode": "raw", "raw": "{\n  \"token\": \"RESET_TOKEN_HERE\",\n  \"newPassword\": \"NewPassword123!\"\n}"}
+          }
+        },
+        {
+          "name": "Validate Token",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/auth/validate"}
+        }
+      ]
+    },
+    {
+      "name": "2. Associations",
+      "item": [
+        {
+          "name": "Get All Associations",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/associations"}
+        },
+        {
+          "name": "Get Association by ID",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}"}
+        },
+        {
+          "name": "Get Association by Slug",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/associations/slug/my-association"}
+        },
+        {
+          "name": "Get Associations Paginated",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/system/associations/paginated?page=0&size=20", "query": [{"key": "page", "value": "0"}, {"key": "size", "value": "20"}]}}
+        },
+        {
+          "name": "Search Associations",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/system/associations/search?query=association", "query": [{"key": "query", "value": "association"}]}}
+        },
+        {
+          "name": "Create Association",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/system/associations",
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Association Test\",\n  \"slug\": \"association-test\",\n  \"type\": \"STUDENT\",\n  \"description\": \"Description de l'association\",\n  \"foundedDate\": \"2024-01-01\",\n  \"email\": \"contact@association.com\",\n  \"phone\": \"+22670000000\",\n  \"address\": \"Ouagadougou, Burkina Faso\"\n}"}
+          }
+        },
+        {
+          "name": "Update Association",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/system/associations/{{associationId}}",
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Association Updated\",\n  \"description\": \"Description mise à jour\"\n}"}
+          }
+        },
+        {
+          "name": "Suspend Association",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}/suspend"}
+        },
+        {
+          "name": "Activate Association",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}/activate"}
+        },
+        {
+          "name": "Archive Association",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}/archive"}
+        },
+        {
+          "name": "Delete Association",
+          "request": {"method": "DELETE", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}"}
+        },
+        {
+          "name": "Get Association Stats",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}/stats"}
+        },
+        {
+          "name": "Get Executive Board",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}/executive-board"}
+        },
+        {
+          "name": "Get Active Members",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/associations/{{associationId}}/active-members"}
+        },
+        {
+          "name": "Check Slug Availability",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/associations/check-slug/test-slug"}
+        }
+      ]
+    },
+    {
+      "name": "3. Users (Members)",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/users"}
+        },
+        {
+          "name": "Get User by ID",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/users/{{userId}}"}
+        },
+        {
+          "name": "Get Users by Association",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/users/association/{{associationId}}"}
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/users",
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"member@example.com\",\n  \"password\": \"Password123!\",\n  \"firstName\": \"Marie\",\n  \"lastName\": \"Martin\",\n  \"whatsapp\": \"+22670111111\",\n  \"associationId\": 1,\n  \"membershipStatus\": \"ACTIVE\"\n}"}
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/users/{{userId}}",
+            "body": {"mode": "raw", "raw": "{\n  \"firstName\": \"Marie Updated\",\n  \"whatsapp\": \"+22670222222\"\n}"}
+          }
+        },
+        {
+          "name": "Approve Member",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/users/{{userId}}/approve",
+            "body": {"mode": "raw", "raw": "{\n  \"membershipDate\": \"2024-01-15\",\n  \"membershipNumber\": \"M2024001\"\n}"}
+          }
+        },
+        {
+          "name": "Activate Membership",
+          "request": {"method": "PUT", "header": [], "url": "{{baseUrl}}/members/users/{{userId}}/activate"}
+        },
+        {
+          "name": "Suspend User",
+          "request": {"method": "PUT", "header": [], "url": "{{baseUrl}}/members/users/{{userId}}/suspend"}
+        },
+        {
+          "name": "Delete User",
+          "request": {"method": "DELETE", "header": [], "url": "{{baseUrl}}/members/users/{{userId}}"}
+        }
+      ]
+    },
+    {
+      "name": "4. Roles",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/roles"}
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/roles/{{roleId}}"}
+        },
+        {
+          "name": "Get Roles by Association",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/roles/association/{{associationId}}"}
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/roles",
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Trésorier\",\n  \"slug\": \"tresorier\",\n  \"description\": \"Gestion des finances\",\n  \"type\": \"EXECUTIVE\",\n  \"associationId\": 1,\n  \"permissions\": {\n    \"finance.view\": true,\n    \"finance.manage\": true,\n    \"transactions.create\": true\n  },\n  \"isTemplate\": false,\n  \"displayOrder\": 3\n}"}
+          }
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/roles/{{roleId}}",
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Trésorier Général\",\n  \"description\": \"Gestion complète des finances\"\n}"}
+          }
+        },
+        {
+          "name": "Assign Role to User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/roles/assign",
+            "body": {"mode": "raw", "raw": "{\n  \"userId\": 2,\n  \"roleId\": 1,\n  \"assignedById\": 1,\n  \"termStart\": \"2024-01-01\",\n  \"termEnd\": \"2024-12-31\"\n}"}
+          }
+        },
+        {
+          "name": "Revoke Role from User",
+          "request": {"method": "POST", "header": [], "url": {"raw": "{{baseUrl}}/members/roles/revoke?userId=2&roleId=1", "query": [{"key": "userId", "value": "2"}, {"key": "roleId", "value": "1"}]}}
+        },
+        {
+          "name": "Delete Role",
+          "request": {"method": "DELETE", "header": [], "url": "{{baseUrl}}/members/roles/{{roleId}}"}
+        }
+      ]
+    },
+    {
+      "name": "5. Posts (Postes)",
+      "item": [
+        {
+          "name": "Get All Posts",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/members/posts?associationId={{associationId}}", "query": [{"key": "associationId", "value": "{{associationId}}"}]}}
+        },
+        {
+          "name": "Get Post by ID",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}"}
+        },
+        {
+          "name": "Get Posts Paginated",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/members/posts/paginated?page=0&size=20", "query": [{"key": "page", "value": "0"}, {"key": "size", "value": "20"}]}}
+        },
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/posts",
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Secrétaire Général\",\n  \"slug\": \"secretaire-general\",\n  \"description\": \"Responsable de l'administration\",\n  \"associationId\": 1,\n  \"isExecutive\": true,\n  \"displayOrder\": 2,\n  \"maxHolders\": 1,\n  \"requiresElection\": true\n}"}
+          }
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/posts/{{postId}}",
+            "body": {"mode": "raw", "raw": "{\n  \"name\": \"Secrétaire Général Adjoint\",\n  \"description\": \"Assistant du secrétaire\"\n}"}
+          }
+        },
+        {
+          "name": "Activate Post",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}/activate"}
+        },
+        {
+          "name": "Deactivate Post",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}/deactivate"}
+        },
+        {
+          "name": "Delete Post",
+          "request": {"method": "DELETE", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}"}
+        },
+        {
+          "name": "Get Current Holders",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}/current-holders"}
+        },
+        {
+          "name": "Link Role to Post",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}/roles/{{roleId}}"}
+        },
+        {
+          "name": "Unlink Role from Post",
+          "request": {"method": "DELETE", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}/roles/{{roleId}}"}
+        },
+        {
+          "name": "Get Suggested Roles",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}/suggested-roles"}
+        },
+        {
+          "name": "Get Post Stats",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/posts/{{postId}}/stats"}
+        }
+      ]
+    },
+    {
+      "name": "6. Mandates",
+      "item": [
+        {
+          "name": "Get Mandate by ID",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/mandates/{{mandateId}}"}
+        },
+        {
+          "name": "Get User Mandates",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/members/mandates/user/{{userId}}?activeOnly=true", "query": [{"key": "activeOnly", "value": "true"}]}}
+        },
+        {
+          "name": "Get Current Mandates by Association",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/members/mandates/association/{{associationId}}/current"}
+        },
+        {
+          "name": "Assign Post to User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/mandates/assign-post",
+            "body": {"mode": "raw", "raw": "{\n  \"userId\": 2,\n  \"postId\": 1,\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-12-31\",\n  \"assignRole\": true,\n  \"roleOverrideId\": null,\n  \"notes\": \"Élu lors de l'AG 2024\"\n}"}
+          }
+        },
+        {
+          "name": "Revoke Mandate",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/members/mandates/{{mandateId}}/revoke",
+            "body": {"mode": "raw", "raw": "{\n  \"reason\": \"Démission\",\n  \"revokeRole\": true\n}"}
+          }
+        },
+        {
+          "name": "Extend Mandate",
+          "request": {"method": "POST", "header": [], "url": {"raw": "{{baseUrl}}/members/mandates/{{mandateId}}/extend?newEndDate=2025-12-31", "query": [{"key": "newEndDate", "value": "2025-12-31"}]}}
+        }
+      ]
+    },
+    {
+      "name": "7. Permissions",
+      "item": [
+        {
+          "name": "Get All Permissions",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/core/permissions/all"}
+        },
+        {
+          "name": "Get Grouped Permissions",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/core/permissions/grouped"}
+        }
+      ]
+    },
+    {
+      "name": "8. Audit Logs",
+      "item": [
+        {
+          "name": "Get All Logs",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/system/audit/logs?page=0&size=50", "query": [{"key": "page", "value": "0"}, {"key": "size", "value": "50"}]}}
+        },
+        {
+          "name": "Get Log by ID",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/audit/logs/1"}
+        },
+        {
+          "name": "Search Logs",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/system/audit/logs/search?action=CREATE&entityType=User", "query": [{"key": "action", "value": "CREATE"}, {"key": "entityType", "value": "User"}]}}
+        },
+        {
+          "name": "Get Entity Logs",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/system/audit/logs/entity?entityType=User&entityId=1", "query": [{"key": "entityType", "value": "User"}, {"key": "entityId", "value": "1"}]}}
+        },
+        {
+          "name": "Get User Logs",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/audit/logs/user/{{userId}}"}
+        },
+        {
+          "name": "Get Critical Logs",
+          "request": {"method": "GET", "header": [], "url": {"raw": "{{baseUrl}}/system/audit/logs/critical?limit=100", "query": [{"key": "limit", "value": "100"}]}}
+        },
+        {
+          "name": "Get Audit Stats",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/system/audit/stats"}
+        }
+      ]
+    }
+  ]
+}
