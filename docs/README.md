@@ -1,14 +1,19 @@
 # Documentation Associa
 
-Index rapide des documents utiles.
+Index clair et organise des documents utiles.
 
-## Dashboards
+## Mise en place
+- `docs/setup/backend.md`
+- `docs/setup/frontend.md`
+
+## Produit
+- `docs/product/modules.md`
+- `docs/product/permissions.md`
+
+## Dashboard
 - `docs/dashboard/DASHBOARD_README.md`
 - `docs/dashboard/DASHBOARD_IMPLEMENTATION_GUIDE.md`
 - `docs/dashboard/DASHBOARD_TEST_GUIDE.md`
-
-## Permissions
-- `docs/permissions/README_PERMISSIONS.md`
 
 ## Architecture
 - `docs/architecture/archi.md`
@@ -16,6 +21,9 @@ Index rapide des documents utiles.
 
 ## API
 - `docs/api/postman/Associa_API_Complete.postman_collection.json`
+
+## Tests
+- `docs/testing/README.md`
 
 ## Exemples
 - `docs/examples/DASHBOARD_EXAMPLE_COMPLETE.java`

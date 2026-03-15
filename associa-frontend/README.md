@@ -1,80 +1,55 @@
 # Associa Frontend
 
-Application de gestion d'associations développée avec React + Vite.
+Application de gestion d'associations developpee avec React + Vite.
 
-## 🚀 Démarrage rapide
+## Demarrage rapide
 
 ```bash
-# Installation des dépendances
 npm install
-
-# Lancer le serveur de développement
 npm run dev
+```
 
-# Build pour la production
+Build et preview :
+
+```bash
 npm run build
-
-# Prévisualiser le build
 npm run preview
 ```
 
-## 📁 Structure du projet
+## Configuration
 
-```
-src/
-├── api/              # Services API et client axios
-├── assets/           # Images, icônes, fonts
-├── components/       # Composants React
-│   ├── common/      # Composants réutilisables
-│   ├── layout/      # Layouts (Header, Sidebar, etc.)
-│   └── features/    # Composants par fonctionnalité
-├── config/          # Configuration (API, permissions, app)
-├── contexts/        # React Contexts
-├── hooks/           # Custom hooks
-├── pages/           # Pages de l'application
-├── router/          # Configuration du routing
-├── store/           # State management (Zustand)
-├── styles/          # Styles globaux
-├── types/           # Types et enums
-└── utils/           # Utilitaires et helpers
-```
-
-## 🛠️ Technologies
-
-- **React 18** - Framework UI
-- **Vite** - Build tool
-- **React Router** - Routing
-- **TanStack Query** - Data fetching
-- **Zustand** - State management
-- **Axios** - HTTP client
-- **Tailwind CSS** - Styling
-- **date-fns** - Date manipulation
-
-## 🔧 Configuration
-
-Copier `.env.example` vers `.env` et configurer les variables:
+Copier `.env.example` vers `.env` et configurer :
 
 ```env
-VITE_API_BASE_URL=http://192.168.11.121:8000/api
+VITE_API_BASE_URL=http://localhost:8080
 VITE_APP_NAME=Associa
 VITE_APP_VERSION=1.0.0
 ```
 
-## 📝 Conventions
+## Structure du projet
 
-- **Composants**: PascalCase (ex: `UserCard.jsx`)
-- **Hooks**: camelCase avec préfixe `use` (ex: `useAuth.js`)
-- **Services**: camelCase avec suffixe `.service.js`
-- **Imports**: Utiliser les alias `@` (ex: `@components/...`)
+```
+src/
+├── app/              # App et router
+├── features/         # Pages et domaines metiers
+├── shared/           # Composants, hooks, api, utils, styles
+└── main.jsx
+```
 
-## 🎨 Styling
+## Technologies
 
-Le projet utilise Tailwind CSS avec des variables CSS personnalisées définies dans `src/styles/variables.css`.
+- React 18
+- Vite
+- React Router
+- TanStack Query
+- Zustand
+- Axios
+- Tailwind CSS
+- date-fns
 
-## 📦 Scripts disponibles
+## Scripts
 
-- `npm run dev` - Démarre le serveur de développement
-- `npm run build` - Build pour la production
-- `npm run preview` - Prévisualise le build
-- `npm run lint` - Lint le code
-- `npm run format` - Formate le code avec Prettier
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`
