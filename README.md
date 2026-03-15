@@ -1,20 +1,32 @@
 # Associa
 
-Plateforme de gestion d'associations (membres, mandats, roles, cotisations, finances, evenements, documents, messages, votes).
+Associa est une plateforme complete de gestion d'associations. Elle centralise les membres, les mandats, les finances et les activites pour donner une vue claire du fonctionnement et faciliter la prise de decision.
+
+## Ce que fait le projet
+
+- Gestion des membres : creation, approbation, suspension, profils
+- Organisation : postes, mandats et historique du bureau
+- Roles et permissions : acces granulaires par fonctionnalite
+- Finances : transactions, approbations, exports PDF/Excel
+- Cotisations : generation, paiements, statistiques
+- Evenements : creation, participation et presence
+- Documents : depot, partage et telechargement
+- Communication : annonces et messages internes
+- Gouvernance : votes, options et resultats
+- Dashboard : indicateurs cles et activite recente
+- Audit : tracabilite des actions sensibles
+
+## Stack technique
+
+- Backend : Java 21, Spring Boot, Spring Security, JWT, PostgreSQL
+- Frontend : React 18, Vite, TanStack Query, Zustand, Tailwind CSS
 
 ## Structure du depot
 
-- `associa-backend` : API Spring Boot (Java 21)
-- `associa-frontend` : Frontend React (Vite)
-- `docs` : documentation produit et technique
+- `associa-backend` : API Spring Boot
+- `associa-frontend` : application web React
+- `docs` : documentation
 - `tests` : tests E2E Selenium
-
-## Prerequis
-
-- Java 21
-- Maven 3.8+
-- Node.js 18+
-- PostgreSQL 14+
 
 ## Demarrage rapide
 
@@ -34,11 +46,22 @@ npm install
 npm run dev
 ```
 
-Par defaut, l'API tourne sur `http://localhost:8080`. Configure `VITE_API_BASE_URL` cote frontend.
+API : `http://localhost:8080`
+Swagger : `http://localhost:8080/swagger-ui/index.html`
+
+## Configuration
+
+Variables utiles :
+
+- `DB_URL`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `JWT_SECRET`
+- `VITE_API_BASE_URL`
 
 ## Documentation
 
-Voir `docs/README.md` pour l'index complet.
+Voir `docs/README.md` pour l'index.
 
 ## Tests
 

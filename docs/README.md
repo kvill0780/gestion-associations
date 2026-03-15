@@ -24,6 +24,3 @@ Index clair et organise des documents utiles.
 
 ## Tests
 - `docs/testing/README.md`
-
-## Exemples
-- `docs/examples/DASHBOARD_EXAMPLE_COMPLETE.java`
